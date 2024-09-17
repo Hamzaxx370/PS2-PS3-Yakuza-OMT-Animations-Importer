@@ -8,7 +8,7 @@ Yakuza 1 and Yakuza 2 MTBW Camera files (Experimental)
 
 Thanks to:  
 
--[Jhrino](https://github.com/Fronkln) for reversing most of the format  
+-[Jhrino](https://github.com/Fronkln) for reversing most of the OMT format  
 -[Gabe Hen](https://github.com/gabehenreal) for helping with the quaternion calculations  
   
 ## Suggested Tools:  
