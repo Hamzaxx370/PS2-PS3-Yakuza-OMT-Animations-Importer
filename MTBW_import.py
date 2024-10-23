@@ -3,7 +3,7 @@ from .binary_reader import BinaryReader
 import math
 import mathutils
 
-def import_MTBW(context, filepath):
+def import_MTBW(context, filepath,ISCUTSCENE):
 
     MTBW = open (filepath,"rb")
     reader = BinaryReader(MTBW.read())
@@ -81,7 +81,10 @@ def import_MTBW(context, filepath):
             else: 
                 FOV = (SnsorWidth/2)/math.tan(math.radians(Data3[frames3])/2)
                 bpy.context.scene.frame_set(Keyframes[2][frames3])
-                CAMOBJ.data.lens= FOV*2
+                if ISCUTSCENE:
+                    CAMOBJ.data.lens= FOV
+                else:
+                    CAMOBJ.data.lens= FOV*2
                 CAMOBJ.data.keyframe_insert(data_path="lens",frame=(Keyframes[2][frames3]))
                 
     for frames2 in range(len(Keyframes[1])):
