@@ -22,3 +22,5 @@ Thanks to:
 -[DATman](https://github.com/SamuraiOndo/DATMan) by [SamuraiOndo](https://github.com/SamuraiOndo) to extract Animation Containers from Media1/Motion.  
   
 -[AuthEdit](https://github.com/Fronkln/HActLib/tree/authedit_1.5.6) by [Jhrino](https://github.com/Fronkln) to extract Heat action animations from Media1/Yact.
+
+-My [AUTH-SCENEman](https://github.com/Hamzaxx370/PS2-PS3-Yakuza-Auth-Extractor) to extract cutscene animations from Media2/Author
