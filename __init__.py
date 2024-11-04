@@ -191,7 +191,9 @@ class ExportOMT(Operator, ExportHelper):
         PatternFrames = []
         for pattern in props.patterns:
             PatternData.append((pattern.lefthand,pattern.righthand,pattern.head))
+            PatternData.append((pattern.lefthand+0.10,pattern.righthand+0.10,pattern.head+0.10))
             PatternFrames.append(pattern.frame)
+            PatternFrames.append(pattern.frame1)
         
         return export_omt(context, self.filepath,PatternData,PatternFrames,self.Scale,self.ScaleHeight,self.DEBULLSHIT)
     
@@ -200,7 +202,8 @@ class Patterns(bpy.types.PropertyGroup):
     lefthand: bpy.props.FloatProperty(name="Left Hand",default=0.0)
     righthand: bpy.props.FloatProperty(name="Right Hand",default=0.0)
     head: bpy.props.FloatProperty(name="Head",default=0.0)
-    frame: bpy.props.FloatProperty(name="Frame",default=0)
+    frame: bpy.props.FloatProperty(name="Start Frame",default=0)
+    frame1: bpy.props.FloatProperty(name="End Frame",default=0)
     
 class Properties(bpy.types.PropertyGroup):
     patterns: bpy.props.CollectionProperty(type=Patterns)
@@ -246,7 +249,8 @@ class PatternPan(bpy.types.Panel):
             box.prop(pattern,"lefthand",text="Left Hand Pattern")
             box.prop(pattern,"righthand",text="Right Hand Pattern")
             box.prop(pattern,"head",text="Head Pattern")
-            box.prop(pattern,"frame",text="Pattern Frame")
+            box.prop(pattern,"frame",text="Frame Start")
+            box.prop(pattern,"frame1",text="Frame End")
             remove=box.operator(RemovePattern.bl_idname,text="Remove")
             RemovePattern.index = index
             
