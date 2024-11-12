@@ -3,11 +3,16 @@ from .binary_reader import BinaryReader
 import math
 import mathutils
 
-def import_MTBW(context, filepath,ISCUTSCENE):
+def import_MTBW(context, filepath,ISCUTSCENE,SMOLL):
 
+    if SMOLL:
+        scale = 10
+    else:
+        scale = 1
     MTBW = open (filepath,"rb")
     reader = BinaryReader(MTBW.read())
     reader.seek(32)
+
     
     DataOffset = reader.read_uint32()+32
     print(DataOffset)
@@ -38,13 +43,16 @@ def import_MTBW(context, filepath,ISCUTSCENE):
         POSY = reader.read_float()
         POSZ = reader.read_float()
         pad = reader.read_float()
-        Data1.append((POSX,POSZ,POSY))
+        Data1.append((POSX/scale,POSZ/scale,POSY/scale))
     for g in range(len(Keyframes[1])):
         POSX = reader.read_float()
         POSY = reader.read_float()
         POSZ = reader.read_float()
         QUAT = reader.read_float()
-        Data2.append((POSX,POSY,POSZ,QUAT))
+        if Flag == 10:
+            Data2.append((POSX,POSY,POSZ,QUAT))
+        else:
+           Data2.append((POSX/scale,POSY/scale,POSZ/scale,QUAT)) 
     for f in range(len(Keyframes[2])):
         reader.read_uint32()
         FOVVAL = reader.read_uint32()

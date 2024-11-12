@@ -22,6 +22,8 @@ if "bpy" in locals():
         importlib.reload(OMT_export) 
     if "MTBW_import" in locals():
         importlib.reload(MTBW_import) 
+    if "MTBW_export" in locals():
+        importlib.reload(MTBW_export) 
     if "binaryreader" in locals():
         importlib.reload(binaryreader)
   
@@ -37,6 +39,8 @@ from .OMT_AUTH_import  import import_omt_auth
 from .OMT_export import export_omt
 
 from .MTBW_import import import_MTBW
+
+from .MTBW_export import export_MTBW
   
 
   
@@ -141,6 +145,11 @@ class ImportMTBW(Operator, ImportHelper):
         description="",
         default=False,
     )
+    SMOLL: BoolProperty(
+        name="Scale to OOE",
+        description="",
+        default=False,
+    )
     
     
     
@@ -148,7 +157,43 @@ class ImportMTBW(Operator, ImportHelper):
 
     def execute(self, context):
         
-        return import_MTBW(context, self.filepath,self.ISCUTSCENE)
+        return import_MTBW(context, self.filepath,self.ISCUTSCENE,self.SMOLL)
+    
+    
+    
+class ExportMTBW(Operator, ExportHelper):
+    """This appears in the tooltip of the operator and in the generated docs"""
+    bl_idname = "export_mtbw.mtbw_data"  
+    bl_label = "Export MTBW"
+
+    
+    filename_ext = ".MTBW"
+
+    filter_glob: StringProperty(
+        default="*.MTBW",
+        options={'HIDDEN'},
+        maxlen=255,  
+    )
+    
+    BIG: BoolProperty(
+        name="Scale to PS2",
+        description="",
+        default=False,
+    )
+    FLIP: BoolProperty(
+        name="Flip to PS2",
+        description="",
+        default=False,
+    )
+    
+    
+    
+    
+    
+
+    def execute(self, context):
+        
+        return export_MTBW(context, self.filepath,self.BIG,self.FLIP)
     
 class ExportOMT(Operator, ExportHelper):
     """This appears in the tooltip of the operator and in the generated docs"""
@@ -181,6 +226,11 @@ class ExportOMT(Operator, ExportHelper):
         description="",
         default=False,
     )
+    ISYACT: BoolProperty(
+        name="Export HACT",
+        description="",
+        default=False,
+    )
     
     
     
@@ -195,7 +245,7 @@ class ExportOMT(Operator, ExportHelper):
             PatternFrames.append(pattern.frame)
             PatternFrames.append(pattern.frame1)
         
-        return export_omt(context, self.filepath,PatternData,PatternFrames,self.Scale,self.ScaleHeight,self.DEBULLSHIT)
+        return export_omt(context, self.filepath,PatternData,PatternFrames,self.Scale,self.ScaleHeight,self.DEBULLSHIT,self.ISYACT)
     
 class Patterns(bpy.types.PropertyGroup):
     
@@ -268,6 +318,9 @@ def menu_func_importMTBW(self, context):
 def menu_func_exportOMT(self, context):
     self.layout.operator(ExportOMT.bl_idname, text="PS2/PS3 OMT Export")
     
+def menu_func_exportMTBW(self, context):
+    self.layout.operator(ExportMTBW.bl_idname, text="PS2/PS3 MTBW Export")
+    
     
     
 
@@ -284,6 +337,9 @@ def register():
     
     bpy.utils.register_class(ExportOMT)
     bpy.types.TOPBAR_MT_file_export.append(menu_func_exportOMT)
+    
+    bpy.utils.register_class(ExportMTBW)
+    bpy.types.TOPBAR_MT_file_export.append(menu_func_exportMTBW)
     
     bpy.utils.register_class(Patterns)
     bpy.utils.register_class(RemovePattern)
@@ -308,6 +364,10 @@ def unregister():
     
     bpy.utils.unregister_class(ExportOMT)
     bpy.types.TOPBAR_MT_file_export.remove(menu_func_exportOMT)
+    
+    bpy.utils.unregister_class(ExportMTBW)
+    bpy.types.TOPBAR_MT_file_export.remove(menu_func_exportMTBW)
+    
     
     bpy.utils.unregister_class(Patterns)
     bpy.utils.unregister_class(RemovePattern)

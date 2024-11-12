@@ -3,7 +3,7 @@ from mathutils import *
 from .binary_reader import BinaryReader 
 import math
 
-def export_omt(context, filepath,PatternData,PatternFrames,Scale,ScaleHeight,DEBULLSHIT):
+def export_omt(context, filepath,PatternData,PatternFrames,Scale,ScaleHeight,DEBULLSHIT,ISYACT):
     
     armature = bpy.context.active_object
     bones = armature.pose.bones
@@ -79,21 +79,20 @@ def export_omt(context, filepath,PatternData,PatternFrames,Scale,ScaleHeight,DEB
             quaternion = (bone.rotation_quaternion)
             
             
-            Magnitude=math.sqrt(((quaternion.w)**2)+((quaternion.x)**2)+((quaternion.y)**2)+((quaternion.z)**2))
+            sums = (quaternion.w**2) + (quaternion.x**2) + quaternion.y**2 + quaternion.z**2
+
+            Magnitude = 1/(math.sqrt(sums))
             QUATSHORTW = (quaternion.w)*Magnitude
             QUATSHORTX = (quaternion.x)*Magnitude
             QUATSHORTY = (quaternion.y)*Magnitude
             QUATSHORTZ = (quaternion.z)*Magnitude
             
         
-            Shortw = int((QUATSHORTW+0.5)*32768)
-            Shortx = int((QUATSHORTX+0.5)*32768)
-            Shorty = int((QUATSHORTY+0.5)*32768)
-            Shortz = int((QUATSHORTZ+0.5)*32768)
-            UShortw= min(max(Shortw,0),65536)
-            UShortx= min(max(Shortx,0),65536)
-            UShorty= min(max(Shorty,0),65536)
-            UShortz= min(max(Shortz,0),65536)
+            Shortw = int((QUATSHORTW+1)*16384)
+            Shortx = int((QUATSHORTX+1)*16384)
+            Shorty = int((QUATSHORTY+1)*16384)
+            Shortz = int((QUATSHORTZ+1)*16384)
+            
             """
             if Shortx==0:
                 Shortx=16384
@@ -103,7 +102,7 @@ def export_omt(context, filepath,PatternData,PatternFrames,Scale,ScaleHeight,DEB
                 Shortz=16384
             """
 
-            QUATLIST[i].append((UShortw,UShortx,UShortz,UShorty))
+            QUATLIST[i].append((Shortw,Shortx,Shortz,Shorty))
             
     
     
@@ -136,11 +135,14 @@ def export_omt(context, filepath,PatternData,PatternFrames,Scale,ScaleHeight,DEB
         Pointer = writer.pos()
         QuatPointerList[QW1].append(Pointer)
         for QW2 in QUATKeyframes[QW1]:
-            
-            writer.write_uint16(BoneQuat[QW2][0])
-            writer.write_uint16(BoneQuat[QW2][1])
-            writer.write_uint16(BoneQuat[QW2][2])
-            writer.write_uint16(BoneQuat[QW2][3])
+            if ISYACT and QW1 in [3,6,14,19]:
+                writer.write_uint16(BoneQuat[QW2][0])
+                writer.write_uint16(BoneQuat[QW2][1])
+            else:
+                writer.write_uint16(BoneQuat[QW2][0])
+                writer.write_uint16(BoneQuat[QW2][1])
+                writer.write_uint16(BoneQuat[QW2][2])
+                writer.write_uint16(BoneQuat[QW2][3])
             
     PatternOffset = writer.pos()
     for PF1 in range(PatternCount):
@@ -153,7 +155,7 @@ def export_omt(context, filepath,PatternData,PatternFrames,Scale,ScaleHeight,DEB
         
             
     
-    
+    writer.align(4)
     KeyframesOffset = writer.pos()
     for KFC in CenterKeyframes:
         if FrameCount>255:
@@ -176,7 +178,7 @@ def export_omt(context, filepath,PatternData,PatternFrames,Scale,ScaleHeight,DEB
             writer.write_uint16(int(PKF))
         else:
             writer.write_uint8(int(PKF))
-    
+    writer.align(4)
     PointersOffset = writer.pos()
     writer.write_uint32(CenterPointer)
     for QP1 in range(BoneCount):
@@ -186,6 +188,7 @@ def export_omt(context, filepath,PatternData,PatternFrames,Scale,ScaleHeight,DEB
     for KP1 in range(BoneCount):
         writer.write_uint32(KeyframePointerList[KP1])
     writer.write_uint32(PatternKyfOffset)
+    writer.align(4)
     if FrameCount>255:
         writer.write_uint16(len(CenterKeyframes))
     else:
@@ -199,16 +202,20 @@ def export_omt(context, filepath,PatternData,PatternFrames,Scale,ScaleHeight,DEB
         writer.write_uint16(len(PatternFrames))
     else:
         writer.write_uint8(len(PatternFrames))
+    writer.align(4)
     FlagOffset = writer.pos()
     lenf = 0
     writer.write_uint8(5)
     lenf+=1
     for FLGS in range(BoneCount-1):
         lenf+=1
-        writer.write_uint8(4)
+        if ISYACT and FLGS in [2,5,13,18]:
+            writer.write_uint8(16)
+        else:
+            writer.write_uint8(4)
     writer.write_uint8(1)
-    lenf+=1
-    writer.pad((lenf))
+    writer.align(16)
+    
     writer.seek(KeyframePointer)
     writer.write_uint32(KeyframesOffset)
     writer.seek(PointertoPointers)
