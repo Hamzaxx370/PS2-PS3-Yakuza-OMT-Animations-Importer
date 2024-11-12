@@ -1,16 +1,9 @@
 ## PS2/PS3 Yakuza Animations Importer  
-A Blender add-on that imports:  
+A Blender add-on that imports and exports:  
   
 -Yakuza 1 and Yakuza 2 OMT animation files(Hact,Battle)  
   
 -Yakuza 1 and Yakuza 2 MTBW Camera files 
-
-Exports:
-
--Yakuza 1 and Yakuza 2 OMT animation files(Hact,Battle)  
-
--Yakuza 1 and Yakuza 2 MTBW Camera files
-
 
 ## Credits
 
